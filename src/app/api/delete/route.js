@@ -1,24 +1,19 @@
-import fs from "fs";
-import path from "path";
+import { del } from "@vercel/blob";
+import { openDB } from "@/lib/db.js";
 
 export async function POST(req) {
   try {
-    const { filename } = await req.json();
+    const { url } = await req.json();
+    if (!url) return new Response(JSON.stringify({ message: "No URL provided" }), { status: 400 });
 
-    if (!filename) {
-      return new Response(JSON.stringify({ message: "No filename provided" }), { status: 400 });
-    }
+    await del(url); // remove from Vercel Blob
 
-    const filePath = path.join(process.cwd(), "public", "uploads", filename);
+    const db = await openDB();
+    await db.run("DELETE FROM uploads WHERE path = ?", [url]);
 
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      return new Response(JSON.stringify({ message: "File deleted successfully" }), { status: 200 });
-    } else {
-      return new Response(JSON.stringify({ message: "File not found" }), { status: 404 });
-    }
+    return new Response(JSON.stringify({ message: "Deleted successfully" }), { status: 200 });
   } catch (err) {
-    console.error("Delete error:", err);
-    return new Response(JSON.stringify({ message: "Failed to delete file" }), { status: 500 });
+    console.error(err);
+    return new Response(JSON.stringify({ message: "Delete failed" }), { status: 500 });
   }
 }

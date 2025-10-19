@@ -1,15 +1,7 @@
-import fs from "fs";
-import path from "path";
+import { openDB } from "@/lib/db.js";
 
 export async function GET() {
-  const dir = path.join(process.cwd(), "public", "uploads");
-
-  // Ensure uploads folder exists
-  if (!fs.existsSync(dir)) {
-    return new Response(JSON.stringify({ files: [] }), { status: 200 });
-  }
-
-  const files = fs.readdirSync(dir).map((name) => `/uploads/${name}`);
-
-  return new Response(JSON.stringify({ files }), { status: 200 });
+  const db = await openDB();
+  const rows = await db.all("SELECT path FROM uploads ORDER BY id DESC");
+  return new Response(JSON.stringify({ files: rows.map(r => r.path) }), { status: 200 });
 }
