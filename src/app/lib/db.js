@@ -3,11 +3,8 @@ import { open } from "sqlite";
 import path from "path";
 
 export async function openDB() {
-  // Build an absolute path to your SQLite file in the project root
-  const dbPath = path.join(process.cwd(), "database.sqlite");
-
   return open({
-    filename: dbPath,
+    filename: ":memory:",
     driver: sqlite3.Database,
   });
 }
