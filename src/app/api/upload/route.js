@@ -20,7 +20,9 @@ export async function POST(req) {
       const blob = await put(file.name, buffer, {
         access: "public",
         token: process.env.ERIS_READ_WRITE_TOKEN,
+        allowOverwrite: true,
       });
+
       url = blob.url;
     } else {
       // Local dev fallback: write to public/uploads
