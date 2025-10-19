@@ -34,6 +34,7 @@ export default function Home() {
     try {
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
+      console.log(data);
       if (!res.ok) throw new Error(data?.message || "Upload failed");
 
       setFile(null);
